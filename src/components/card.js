@@ -1,10 +1,9 @@
 export function createCard(
   title,
   imageSource,
-  openPopup,
-  modalImage,
-  modalImageImg,
-  popupToggleClassOpen
+  deleteCard,
+  likeCard,
+  openImageHandler
 ) {
   const cardTemplate = document.querySelector("#card-template").content;
   const card = cardTemplate.querySelector(".card").cloneNode(true);
@@ -16,30 +15,24 @@ export function createCard(
   cardImage.src = imageSource;
   card.querySelector(".card__image").alt = title;
 
-  deleteButton.addEventListener("click", () => {
-    deleteCardTemplate(card);
+  deleteButton.addEventListener("click", function () {
+    deleteCard(card);
   });
 
-  likeButton.addEventListener("click", (evt) =>
-    likeCardHandler(evt, likeButtonClassActive)
-  );
+  likeButton.addEventListener("click", function (evt) {
+    likeCard(evt, likeButtonClassActive);
+  });
 
-  cardImage.addEventListener("click", () => {
-    openImageHandler(modalImageImg, imageSource, title);
-    openPopup(modalImage, popupToggleClassOpen);
+  cardImage.addEventListener("click", function () {
+    openImageHandler(imageSource, title);
   });
   return card;
 }
 
-function likeCardHandler(currentTarget, likeButtonClassActive) {
+export function likeCardHandler(currentTarget, likeButtonClassActive) {
   currentTarget.target.classList.toggle(likeButtonClassActive);
 }
 
-function deleteCardTemplate(thisCard) {
+export function deleteCardTemplate(thisCard) {
   thisCard.remove();
-}
-
-function openImageHandler(modalImageImg, link, alt) {
-  modalImageImg.src = link;
-  modalImageImg.alt = alt;
 }

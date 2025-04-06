@@ -1,56 +1,19 @@
 export function openModal(popupFrame, classActive) {
   popupFrame.classList.add(classActive);
-  const closeBtn = popupFrame.querySelector(".popup__close");
-  //вешаем слушатель на кнопку закрытия
-  closeBtn.addEventListener("click", (event) => {
-    event.stopPropagation();
-    closeModal(popupFrame, classActive);
-  });
-  //вешаем слушатель на бэкдроп
-  popupFrame.addEventListener("click", closeModalBackdrop);
-  //вешаем слушатель на Еsc
-  document.addEventListener("keydown", (evt) => {
-    if (evt.key === "Escape") {
-      const openedPopup = document.querySelector(".popup_is-opened");
-      if (openedPopup) {
-        closeModal(openedPopup, classActive);
-      }
-    }
-  });
 }
 
-function closeModal(popupFrame, classActive) {
+export function closeModal(popupFrame, classActive) {
   popupFrame.classList.remove(classActive);
-  const closeBtn = popupFrame.querySelector(".popup__close");
-  //убираем слушатель с кнопки закрытия
-  closeBtn.removeEventListener("click", (event) => {
-    event.stopPropagation();
-    closeModal(popupFrame, classActive);
-  });
-  //убираем слушатель на бэкдроп
-  popupFrame.removeEventListener("click", closeModalBackdrop);
-  //убираем слушатель на Еsc
-  document.removeEventListener("keydown", (evt) => {
-    if (evt.key === "Escape") {
-      const openedPopup = document.querySelector(".popup_is-opened");
-      if (openedPopup) {
-        closeModal(openedPopup, classActive);
-      }
-    }
-  });
 }
 
-function closeModalBackdrop({ currentTarget, target }) {
+export function closeModalBackdrop({ currentTarget, target }) {
   const classActive = "popup_is-opened";
   if (currentTarget === target) {
     closeModal(currentTarget, classActive);
   }
 }
 
-export function handleFormEditAutocomplete (
-    nameInput,
-    jobInput
-) {
+export function handleFormEditAutocomplete(nameInput, jobInput) {
   const title = document.querySelector(".profile__title");
   const description = document.querySelector(".profile__description");
 
@@ -92,10 +55,10 @@ export function handleFormAddSubmit(
   const imageTitle = cardNameInput.value;
   const link = linkInput.value;
 
-  renderCard([{ name: imageTitle, link: link }]);
+  renderCard({ name: imageTitle, link: link });
+  console.log(modalProfileAdd);
 
   closeModal(modalProfileAdd, popupToggleClassOpen);
 
-  cardNameInput.value = "";
-  linkInput.value = "";
+  modalProfileAdd.querySelector(".popup__form").reset();
 }

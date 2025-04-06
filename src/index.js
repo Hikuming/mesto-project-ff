@@ -1,24 +1,30 @@
-import "../pages/index.css";
+import "./pages/index.css";
 import { initialCards } from "./cards";
-import { createCard } from "./components/card";
+import {
+  createCard,
+  deleteCardTemplate,
+  likeCardHandler,
+} from "./components/card";
 import {
   openModal,
+  closeModal,
+  closeModalBackdrop,
   handleFormEditAutocomplete,
   handleFormEditSubmit,
   handleFormAddSubmit,
 } from "./components/modal";
 
-const addIcon = new URL("../images/add-icon.svg", import.meta.url);
-const avatar = new URL("../images/avatar.jpg", import.meta.url);
-const card_1 = new URL("../images/card_1.jpg", import.meta.url);
-const card_2 = new URL("../images/card_2.jpg", import.meta.url);
-const card_3 = new URL("../images/card_3.jpg", import.meta.url);
-const close = new URL("../images/close.svg", import.meta.url);
-const deleteIcon = new URL("../images/delete-icon.svg", import.meta.url);
-const editIcon = new URL("../images/edit-icon.svg", import.meta.url);
-const likeActive = new URL("../images/like-active.svg", import.meta.url);
-const likeInactive = new URL("../images/like-inactive.svg", import.meta.url);
-const logo = new URL("../images/logo.svg", import.meta.url);
+const addIcon = new URL("./images/add-icon.svg", import.meta.url);
+const avatar = new URL("./images/avatar.jpg", import.meta.url);
+const card_1 = new URL("./images/card_1.jpg", import.meta.url);
+const card_2 = new URL("./images/card_2.jpg", import.meta.url);
+const card_3 = new URL("./images/card_3.jpg", import.meta.url);
+const close = new URL("./images/close.svg", import.meta.url);
+const deleteIcon = new URL("./images/delete-icon.svg", import.meta.url);
+const editIcon = new URL("./images/edit-icon.svg", import.meta.url);
+const likeActive = new URL("./images/like-active.svg", import.meta.url);
+const likeInactive = new URL("./images/like-inactive.svg", import.meta.url);
+const logo = new URL("./images/logo.svg", import.meta.url);
 
 const images = [
   { name: "addIcon", link: addIcon },
@@ -46,6 +52,11 @@ const modalImage = document.querySelector(".popup_type_image");
 
 const modalImageImg = modalImage.querySelector(".popup__image");
 
+const modalProfileEditCloseBtn =
+  modalProfileEdit.querySelector(".popup__close");
+const modalProfileAddCloseBtn = modalProfileAdd.querySelector(".popup__close");
+const modalImageCloseBtn = modalImage.querySelector(".popup__close");
+
 //declaration inputs forms
 const nameInput = modalProfileEdit.querySelector(".popup__input_type_name");
 const jobInput = modalProfileEdit.querySelector(
@@ -61,48 +72,94 @@ const linkInput = modalProfileAdd.querySelector(".popup__input_type_url");
 const popupToggleClassOpen = "popup_is-opened";
 
 //open popup
-profileEditBtn.addEventListener("click", () => {
+profileEditBtn.addEventListener("click", function () {
   handleFormEditAutocomplete(nameInput, jobInput);
   openModal(modalProfileEdit, popupToggleClassOpen);
 });
-profileAddBtn.addEventListener("click", () =>
-  openModal(modalProfileAdd, popupToggleClassOpen)
-);
+profileAddBtn.addEventListener("click", function () {
+  openModal(modalProfileAdd, popupToggleClassOpen);
+});
 
-modalProfileEdit.addEventListener("submit", (evt) =>
+//close popup
+modalProfileEditCloseBtn.addEventListener("click", function () {
+  closeModal(modalProfileEdit, popupToggleClassOpen);
+});
+modalProfileAddCloseBtn.addEventListener("click", function () {
+  closeModal(modalProfileAdd, popupToggleClassOpen);
+});
+modalImageCloseBtn.addEventListener("click", function () {
+  closeModal(modalImage, popupToggleClassOpen);
+});
+
+//close backdrop popup
+modalProfileEdit.addEventListener("click", closeModalBackdrop);
+modalProfileAdd.addEventListener("click", closeModalBackdrop);
+modalImage.addEventListener("click", closeModalBackdrop);
+
+//close Esc popup
+document.addEventListener("keydown", function (evt) {
+  if (evt.key === "Escape") {
+    const openedPopup = document.querySelector(".popup_is-opened");
+    if (popupToggleClassOpen) {
+      closeModal(openedPopup, popupToggleClassOpen);
+    }
+  }
+});
+
+modalProfileEdit.addEventListener("submit", function (evt) {
   handleFormEditSubmit(
     evt,
     modalProfileEdit,
     popupToggleClassOpen,
     nameInput,
     jobInput
-  )
-);
-modalProfileAdd.addEventListener("submit", (evt) =>
+  );
+});
+modalProfileAdd.addEventListener("submit", function (evt) {
   handleFormAddSubmit(
     evt,
     modalProfileAdd,
     popupToggleClassOpen,
     cardNameInput,
     linkInput,
-    renderCard
-  )
-);
+    renderNewCard
+  );
+});
+
+function openImageHandler(link, alt) {
+  openModal(modalImage, popupToggleClassOpen);
+  console.log(modalImageImg);
+  console.log(link);
+  console.log(alt);
+  modalImageImg.src = link;
+  modalImageImg.alt = alt;
+}
 
 // @todo: Вывести карточки на страницу
-function renderCard(initialCards) {
+function renderCards(initialCards) {
   initialCards.forEach((element) => {
-    placesList.prepend(
+    placesList.append(
       createCard(
         element.name,
         element.link,
-        openModal,
-        modalImage,
-        modalImageImg,
-        popupToggleClassOpen
+        deleteCardTemplate,
+        likeCardHandler,
+        openImageHandler
       )
     );
   });
 }
 
-renderCard(initialCards);
+function renderNewCard(initialCards) {
+  placesList.prepend(
+    createCard(
+      initialCards.name,
+      initialCards.link,
+      deleteCardTemplate,
+      likeCardHandler,
+      openImageHandler
+    )
+  );
+}
+
+renderCards(initialCards);
