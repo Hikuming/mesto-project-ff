@@ -9,9 +9,6 @@ import {
   openModal,
   closeModal,
   closeModalBackdrop,
-  handleFormEditAutocomplete,
-  handleFormEditSubmit,
-  handleFormAddSubmit,
 } from "./components/modal";
 
 const addIcon = new URL("./images/add-icon.svg", import.meta.url);
@@ -51,6 +48,7 @@ const modalProfileAdd = document.querySelector(".popup_type_new-card");
 const modalImage = document.querySelector(".popup_type_image");
 
 const modalImageImg = modalImage.querySelector(".popup__image");
+const modalImageCaption = modalImage.querySelector('.popup__caption');
 
 const modalProfileEditCloseBtn =
   modalProfileEdit.querySelector(".popup__close");
@@ -96,16 +94,6 @@ modalProfileEdit.addEventListener("click", closeModalBackdrop);
 modalProfileAdd.addEventListener("click", closeModalBackdrop);
 modalImage.addEventListener("click", closeModalBackdrop);
 
-//close Esc popup
-document.addEventListener("keydown", function (evt) {
-  if (evt.key === "Escape") {
-    const openedPopup = document.querySelector(".popup_is-opened");
-    if (popupToggleClassOpen) {
-      closeModal(openedPopup, popupToggleClassOpen);
-    }
-  }
-});
-
 modalProfileEdit.addEventListener("submit", function (evt) {
   handleFormEditSubmit(
     evt,
@@ -128,11 +116,59 @@ modalProfileAdd.addEventListener("submit", function (evt) {
 
 function openImageHandler(link, alt) {
   openModal(modalImage, popupToggleClassOpen);
-  console.log(modalImageImg);
-  console.log(link);
-  console.log(alt);
   modalImageImg.src = link;
   modalImageImg.alt = alt;
+  modalImageCaption.textContent = alt;
+}
+
+function handleFormEditAutocomplete(nameInput, jobInput) {
+  const title = document.querySelector(".profile__title");
+  const description = document.querySelector(".profile__description");
+
+  nameInput.value = title.textContent;
+  jobInput.value = description.textContent;
+}
+
+function handleFormEditSubmit(
+  evt,
+  modalProfileEdit,
+  popupToggleClassOpen,
+  nameInput,
+  jobInput
+) {
+  evt.preventDefault();
+
+  const name = nameInput.value;
+  const job = jobInput.value;
+
+  const title = document.querySelector(".profile__title");
+  const description = document.querySelector(".profile__description");
+
+  title.textContent = name;
+  description.textContent = job;
+
+  closeModal(modalProfileEdit, popupToggleClassOpen);
+}
+
+function handleFormAddSubmit(
+  evt,
+  modalProfileAdd,
+  popupToggleClassOpen,
+  cardNameInput,
+  linkInput,
+  renderCard
+) {
+  evt.preventDefault();
+
+  const imageTitle = cardNameInput.value;
+  const link = linkInput.value;
+
+  renderCard({ name: imageTitle, link: link });
+  console.log(modalProfileAdd);
+
+  closeModal(modalProfileAdd, popupToggleClassOpen);
+
+  modalProfileAdd.querySelector(".popup__form").reset();
 }
 
 // @todo: Вывести карточки на страницу

@@ -13,7 +13,7 @@ export function createCard(
   const likeButtonClassActive = likeButton.classList[0] + "_is-active";
   card.querySelector(".card__title").textContent = title;
   cardImage.src = imageSource;
-  card.querySelector(".card__image").alt = title;
+  cardImage.alt = title;
 
   deleteButton.addEventListener("click", function () {
     deleteCard(card);
