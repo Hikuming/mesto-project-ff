@@ -50,10 +50,12 @@ const modalImage = document.querySelector(".popup_type_image");
 const modalImageImg = modalImage.querySelector(".popup__image");
 const modalImageCaption = modalImage.querySelector('.popup__caption');
 
-const modalProfileEditCloseBtn =
-  modalProfileEdit.querySelector(".popup__close");
+const modalProfileEditCloseBtn = modalProfileEdit.querySelector(".popup__close");
 const modalProfileAddCloseBtn = modalProfileAdd.querySelector(".popup__close");
 const modalImageCloseBtn = modalImage.querySelector(".popup__close");
+
+const modalProfileEditForm = modalProfileEdit.querySelector(".popup__form");
+const modalProfileAddForm = modalProfileAdd.querySelector(".popup__form");
 
 //declaration inputs forms
 const nameInput = modalProfileEdit.querySelector(".popup__input_type_name");
@@ -72,21 +74,21 @@ const popupToggleClassOpen = "popup_is-opened";
 //open popup
 profileEditBtn.addEventListener("click", function () {
   handleFormEditAutocomplete(nameInput, jobInput);
-  openModal(modalProfileEdit, popupToggleClassOpen);
+  openModal(modalProfileEdit, popupToggleClassOpen, keydownHandle);
 });
 profileAddBtn.addEventListener("click", function () {
-  openModal(modalProfileAdd, popupToggleClassOpen);
+  openModal(modalProfileAdd, popupToggleClassOpen, keydownHandle);
 });
 
 //close popup
 modalProfileEditCloseBtn.addEventListener("click", function () {
-  closeModal(modalProfileEdit, popupToggleClassOpen);
+  closeModal(modalProfileEdit, popupToggleClassOpen, keydownHandle);
 });
 modalProfileAddCloseBtn.addEventListener("click", function () {
-  closeModal(modalProfileAdd, popupToggleClassOpen);
+  closeModal(modalProfileAdd, popupToggleClassOpen, keydownHandle);
 });
 modalImageCloseBtn.addEventListener("click", function () {
-  closeModal(modalImage, popupToggleClassOpen);
+  closeModal(modalImage, popupToggleClassOpen, keydownHandle);
 });
 
 //close backdrop popup
@@ -94,7 +96,7 @@ modalProfileEdit.addEventListener("click", closeModalBackdrop);
 modalProfileAdd.addEventListener("click", closeModalBackdrop);
 modalImage.addEventListener("click", closeModalBackdrop);
 
-modalProfileEdit.addEventListener("submit", function (evt) {
+modalProfileEditForm.addEventListener("submit", function (evt) {
   handleFormEditSubmit(
     evt,
     modalProfileEdit,
@@ -103,7 +105,7 @@ modalProfileEdit.addEventListener("submit", function (evt) {
     jobInput
   );
 });
-modalProfileAdd.addEventListener("submit", function (evt) {
+modalProfileAddForm.addEventListener("submit", function (evt) {
   handleFormAddSubmit(
     evt,
     modalProfileAdd,
@@ -115,7 +117,7 @@ modalProfileAdd.addEventListener("submit", function (evt) {
 });
 
 function openImageHandler(link, alt) {
-  openModal(modalImage, popupToggleClassOpen);
+  openModal(modalImage, popupToggleClassOpen, keydownHandle);
   modalImageImg.src = link;
   modalImageImg.alt = alt;
   modalImageCaption.textContent = alt;
@@ -147,7 +149,7 @@ function handleFormEditSubmit(
   title.textContent = name;
   description.textContent = job;
 
-  closeModal(modalProfileEdit, popupToggleClassOpen);
+  closeModal(modalProfileEdit, popupToggleClassOpen, keydownHandle);
 }
 
 function handleFormAddSubmit(
@@ -166,9 +168,18 @@ function handleFormAddSubmit(
   renderCard({ name: imageTitle, link: link });
   console.log(modalProfileAdd);
 
-  closeModal(modalProfileAdd, popupToggleClassOpen);
+  closeModal(modalProfileAdd, popupToggleClassOpen, keydownHandle);
 
   modalProfileAdd.querySelector(".popup__form").reset();
+}
+
+function keydownHandle (evt) {
+  if (evt.key === "Escape") {
+    const openedPopup = document.querySelector(".popup_is-opened");
+    if (openedPopup) {
+      closeModal(openedPopup, popupToggleClassOpen, keydownHandle);
+    }
+  }
 }
 
 // @todo: Вывести карточки на страницу
