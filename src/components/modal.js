@@ -1,10 +1,10 @@
-export function openModal(popupFrame, classActive) {
+export function openModal(popupFrame, classActive, keydownHandle) {
   popupFrame.classList.add(classActive);
   document.addEventListener("keydown", keydownHandle)
     
 }
 
-export function closeModal(popupFrame, classActive) {
+export function closeModal(popupFrame, classActive, keydownHandle) {
   popupFrame.classList.remove(classActive);
   document.removeEventListener("keydown", keydownHandle)
 }
