@@ -9,6 +9,7 @@ import {
   openModal,
   closeModal,
   closeModalBackdrop,
+  keydownHandle
 } from "./components/modal";
 
 const addIcon = new URL("./images/add-icon.svg", import.meta.url);
@@ -171,15 +172,6 @@ function handleFormAddSubmit(
   closeModal(modalProfileAdd, popupToggleClassOpen, keydownHandle);
 
   modalProfileAdd.querySelector(".popup__form").reset();
-}
-
-function keydownHandle (evt) {
-  if (evt.key === "Escape") {
-    const openedPopup = document.querySelector(".popup_is-opened");
-    if (openedPopup) {
-      closeModal(openedPopup, popupToggleClassOpen, keydownHandle);
-    }
-  }
 }
 
 // @todo: Вывести карточки на страницу
