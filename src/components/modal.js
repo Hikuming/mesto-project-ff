@@ -1,4 +1,5 @@
-export function openModal(popupFrame, classActive, keydownHandle) {
+export function openModal(popupFrame, classActive, keydownHandle, clearValidation, config) {
+  clearValidation(popupFrame, config);
   popupFrame.classList.add(classActive);
   document.addEventListener("keydown", keydownHandle)
     
