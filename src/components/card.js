@@ -1,8 +1,4 @@
-import {
-  deleteCardFromSrv,
-  putLike,
-  deleteLike
-} from "./api"
+import { deleteCardFromSrv, putLike, deleteLike } from "./api";
 
 export function createCard(
   title,
@@ -12,7 +8,8 @@ export function createCard(
   openImageHandler,
   likeArrayUsers,
   deleteButtonActive,
-  cardId
+  cardId,
+  userId
 ) {
   const cardTemplate = document.querySelector("#card-template").content;
   const card = cardTemplate.querySelector(".card").cloneNode(true);
@@ -21,6 +18,9 @@ export function createCard(
   const likeButton = card.querySelector(".card__like-button");
   const likeButtonClassActive = likeButton.classList[0] + "_is-active";
   const likeCount = card.querySelector(".card__like-count");
+  const isLikeActive = likeArrayUsers.some(
+    (likeUser) => likeUser._id === userId
+  );
   card.querySelector(".card__title").textContent = title;
   cardImage.src = imageSource;
   cardImage.alt = title;
@@ -28,13 +28,16 @@ export function createCard(
 
   if (deleteButtonActive) {
     deleteButton.addEventListener("click", function () {
-    deleteCard(card,cardId);
+      deleteCard(card, cardId);
     });
   } else {
-    deleteButton.disabled = true;
-    deleteButton.classList.add('card__delete-button-disabled');
+    deleteButton.remove();
   }
-  
+
+  if (isLikeActive) {
+    likeButton.classList.add(likeButtonClassActive);
+  }
+
   likeButton.addEventListener("click", function (evt) {
     likeCard(evt, likeButtonClassActive, cardId, likeCount);
   });
@@ -45,30 +48,42 @@ export function createCard(
   return card;
 }
 
-export function likeCardHandler(currentTarget, likeButtonClassActive, cardId, likeCount) {
-  currentTarget.target.classList.toggle(likeButtonClassActive);
-  if (currentTarget.target.classList.contains(likeButtonClassActive)){
-    //отправка лайка на сервер 
+export function likeCardHandler(
+  currentTarget,
+  likeButtonClassActive,
+  cardId,
+  likeCount
+) {
+  // currentTarget.target.classList.toggle(likeButtonClassActive);
+  if (!currentTarget.target.classList.contains(likeButtonClassActive)) {
+    //отправка лайка на сервер
     putLike(cardId)
-    .then((res) => {
-      console.log(res.likes.length);
-      //увеличиваем число лайков с ответа от сервера
-      likeCount.textContent = res.likes.length;
-    });
-    console.log("получили айдишник для лайка "+ cardId);
+      .then((res) => {
+        //увеличиваем число лайков с ответа от сервера
+        likeCount.textContent = res.likes.length;
+        currentTarget.target.classList.add(likeButtonClassActive);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   } else {
-    //отправка дизлайка на сервер 
+    //отправка дизлайка на сервер
     deleteLike(cardId)
-    .then((res) => {
-      console.log(res.likes.length);
-      //уменьшаем число лайков с ответа от сервера
-      likeCount.textContent = res.likes.length;
-    });
-    console.log("получили айдишник для дизлайка "+ cardId);
+      .then((res) => {
+        //уменьшаем число лайков с ответа от сервера
+        likeCount.textContent = res.likes.length;
+        currentTarget.target.classList.remove(likeButtonClassActive);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 }
 
 export function deleteCardTemplate(thisCard, cardId) {
-  deleteCardFromSrv(cardId);
-  thisCard.remove();
+  deleteCardFromSrv(cardId)
+    .then(() => thisCard.remove())
+    .catch((err) => {
+      console.log(err);
+    });
 }

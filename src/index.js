@@ -19,6 +19,7 @@ import {
   deleteCardFromSrv,
   putLike,
   deleteLike,
+  getResponseData,
 } from "./components/api";
 
 import { enableValidation, clearValidation } from "./components/validation";
@@ -58,6 +59,7 @@ const modalProfileNewAvatarForm =
   modalProfileNewAvatar.querySelector(".popup__form");
 
 let userId = "";
+let userAvatarImg = "";
 
 //declaration inputs forms
 const nameInput = modalProfileEdit.querySelector(".popup__input_type_name");
@@ -67,7 +69,7 @@ const jobInput = modalProfileEdit.querySelector(
 const cardNameInput = modalProfileAdd.querySelector(
   ".popup__input_type_card-name"
 );
-const linkInput = modalProfileAdd.querySelector(".popup__input_type_url");
+const imageUrlInput = modalProfileAdd.querySelector(".popup__input_type_url");
 const newAvatarInput = modalProfileNewAvatar.querySelector(
   ".popup__input_type_url"
 );
@@ -80,31 +82,16 @@ const userAvatar = document.querySelector(".profile__image");
 //вешаем слушатели на октрытие форм
 profileEditBtn.addEventListener("click", function () {
   handleFormEditAutocomplete(nameInput, jobInput);
-  openModal(
-    modalProfileEdit,
-    popupToggleClassOpen,
-    keydownHandle,
-    clearValidation,
-    validationConfig
-  );
+  clearValidation(modalProfileEdit, validationConfig);
+  openModal(modalProfileEdit, popupToggleClassOpen, keydownHandle);
 });
 profileAddBtn.addEventListener("click", function () {
-  openModal(
-    modalProfileAdd,
-    popupToggleClassOpen,
-    keydownHandle,
-    clearValidation,
-    validationConfig
-  );
+  clearValidation(modalProfileAdd, validationConfig);
+  openModal(modalProfileAdd, popupToggleClassOpen, keydownHandle);
 });
 userAvatar.addEventListener("click", function () {
-  openModal(
-    modalProfileNewAvatar,
-    popupToggleClassOpen,
-    keydownHandle,
-    clearValidation,
-    validationConfig
-  );
+  clearValidation(modalProfileNewAvatar, validationConfig);
+  openModal(modalProfileNewAvatar, popupToggleClassOpen, keydownHandle);
 });
 
 //вешаем слушатели на закрытие форм
@@ -143,7 +130,7 @@ modalProfileAddForm.addEventListener("submit", function (evt) {
     modalProfileAdd,
     popupToggleClassOpen,
     cardNameInput,
-    linkInput,
+    imageUrlInput,
     renderNewCard
   );
 });
@@ -152,13 +139,7 @@ modalProfileNewAvatarForm.addEventListener("submit", function (evt) {
 });
 
 function openImageHandler(link, alt) {
-  openModal(
-    modalImage,
-    popupToggleClassOpen,
-    keydownHandle,
-    clearValidation,
-    validationConfig
-  );
+  openModal(modalImage, popupToggleClassOpen, keydownHandle);
   modalImageImg.src = link;
   modalImageImg.alt = alt;
   modalImageCaption.textContent = alt;
@@ -191,14 +172,15 @@ function handleFormEditSubmit(
 
   pendingButton(true, modalProfileEdit);
   patchUserInfo(name, job)
-    .then((res) => console.log("ок"))
+    .then(() => {
+      console.log("ок");
+      title.textContent = name;
+      description.textContent = job;
+      clearValidation(modalProfileEdit, validationConfig);
+      closeModal(modalProfileEdit, popupToggleClassOpen, keydownHandle);
+    })
     .catch((err) => console.log(err))
     .finally(() => pendingButton(false, modalProfileEdit));
-
-  title.textContent = name;
-  description.textContent = job;
-  clearValidation(modalProfileEdit, validationConfig);
-  closeModal(modalProfileEdit, popupToggleClassOpen, keydownHandle);
 }
 
 function handleFormAddSubmit(
@@ -216,29 +198,35 @@ function handleFormAddSubmit(
   pendingButton(true, modalProfileAdd);
   postNewCard(imageTitle, link)
     .then((res) => {
-      return (id = res._id);
+      id = res._id;
+      renderCard({ name: imageTitle, link: link, cardId: id }, userId);
+      closeModal(modalProfileAdd, popupToggleClassOpen, keydownHandle);
+      clearValidation(modalProfileAdd, validationConfig);
+      modalProfileAddForm.reset();
     })
     .catch((err) => console.log(err))
     .finally(() => pendingButton(false, modalProfileAdd));
-  renderCard({ name: imageTitle, link: link, cardId: id });
-  closeModal(modalProfileAdd, popupToggleClassOpen, keydownHandle);
-  clearValidation(modalProfileAdd, validationConfig);
-  modalProfileAddForm.reset();
+}
+
+function avatarChange(url) {
+  userAvatar.style.backgroundImage = `url('${url}')`;
 }
 
 function handleFromProfileNewAvatarSubmit(evt, urlInput) {
   evt.preventDefault();
   pendingButton(true, modalProfileNewAvatar);
   patchUserAvatar(urlInput.value)
-    .then((res) => (userAvatar.style.backgroundImage = `url('${res.avatar}')`))
+    .then((res) => {
+      avatarChange(res.avatar);
+      closeModal(modalProfileNewAvatar, popupToggleClassOpen, keydownHandle);
+      clearValidation(modalProfileNewAvatar, validationConfig);
+      modalProfileNewAvatarForm.reset();
+    })
     .catch((err) => console.log(err))
     .finally(() => pendingButton(false, modalProfileNewAvatar));
-  closeModal(modalProfileNewAvatar, popupToggleClassOpen, keydownHandle);
-  clearValidation(modalProfileNewAvatar, validationConfig);
-  modalProfileNewAvatarForm.reset();
 }
 
-function renderCards(initialCards) {
+function renderCards(initialCards, userId) {
   initialCards.forEach((element) => {
     //проверка id овнера карточки
     const deleteButtonActive = userId === element.owner._id;
@@ -251,7 +239,8 @@ function renderCards(initialCards) {
         openImageHandler,
         element.likes,
         deleteButtonActive,
-        element._id
+        element._id,
+        userId
       )
     );
   });
@@ -276,7 +265,8 @@ function renderNewCard(initialCards) {
       openImageHandler,
       [],
       true,
-      initialCards.cardId
+      initialCards.cardId,
+      userId
     )
   );
 }
@@ -286,7 +276,9 @@ Promise.all([getUserInfo(), getInitialCards()])
     userName.textContent = userInfo.name;
     userDescription.textContent = userInfo.about;
     userId = userInfo._id;
-    renderCards(initialCardsArray);
+    userAvatarImg = userInfo.avatar;
+    avatarChange(userAvatarImg);
+    renderCards(initialCardsArray, userId);
   })
   .catch((err) => console.log(err));
 

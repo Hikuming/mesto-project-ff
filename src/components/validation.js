@@ -10,6 +10,7 @@ const hideInputError = (formElement, inputElement, config) => {
   inputElement.classList.remove(config.inputErrorClass);
   erorrElement.classList.remove(config.errorClass);
   erorrElement.textContent = "";
+  inputElement.setCustomValidity("");
 };
 
 const checkInputValidity = (formElement, inputElement, config) => {
@@ -17,10 +18,8 @@ const checkInputValidity = (formElement, inputElement, config) => {
     case "url":
       if (inputElement.validity.typeMismatch) {
         inputElement.setCustomValidity(inputElement.dataset.errorMessage);
-        console.log(inputElement.validity);
       } else {
         inputElement.setCustomValidity("");
-        console.log(inputElement.validity);
       }
       break;
     case "text":
@@ -79,7 +78,6 @@ function setEventListeners(formElement, config) {
 export function enableValidation(config) {
   const formList = Array.from(document.querySelectorAll(config.formSelector));
   formList.forEach((formElement) => {
-    formElement.addEventListener("submit", (event) => event.preventDefault());
     setEventListeners(formElement, config);
   });
 }

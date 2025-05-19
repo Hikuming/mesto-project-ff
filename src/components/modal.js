@@ -1,13 +1,11 @@
-export function openModal(popupFrame, classActive, keydownHandle, clearValidation, config) {
-  clearValidation(popupFrame, config);
+export function openModal(popupFrame, classActive, keydownHandle) {
   popupFrame.classList.add(classActive);
-  document.addEventListener("keydown", keydownHandle)
-    
+  document.addEventListener("keydown", keydownHandle);
 }
 
 export function closeModal(popupFrame, classActive, keydownHandle) {
   popupFrame.classList.remove(classActive);
-  document.removeEventListener("keydown", keydownHandle)
+  document.removeEventListener("keydown", keydownHandle);
 }
 
 export function closeModalBackdrop({ currentTarget, target }) {
@@ -17,7 +15,7 @@ export function closeModalBackdrop({ currentTarget, target }) {
   }
 }
 
-export function keydownHandle (evt) {
+export function keydownHandle(evt) {
   if (evt.key === "Escape") {
     const openedPopup = document.querySelector(".popup_is-opened");
     const popupToggleClassOpen = "popup_is-opened";
