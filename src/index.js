@@ -86,10 +86,12 @@ profileEditBtn.addEventListener("click", function () {
   openModal(modalProfileEdit, popupToggleClassOpen, keydownHandle);
 });
 profileAddBtn.addEventListener("click", function () {
+  modalProfileAddForm.reset();
   clearValidation(modalProfileAdd, validationConfig);
   openModal(modalProfileAdd, popupToggleClassOpen, keydownHandle);
 });
 userAvatar.addEventListener("click", function () {
+  modalProfileNewAvatarForm.reset();
   clearValidation(modalProfileNewAvatar, validationConfig);
   openModal(modalProfileNewAvatar, popupToggleClassOpen, keydownHandle);
 });
@@ -172,10 +174,9 @@ function handleFormEditSubmit(
 
   pendingButton(true, modalProfileEdit);
   patchUserInfo(name, job)
-    .then(() => {
-      console.log("ок");
-      title.textContent = name;
-      description.textContent = job;
+    .then((res) => {
+      title.textContent = res.name;
+      description.textContent = res.about;
       clearValidation(modalProfileEdit, validationConfig);
       closeModal(modalProfileEdit, popupToggleClassOpen, keydownHandle);
     })
@@ -198,8 +199,7 @@ function handleFormAddSubmit(
   pendingButton(true, modalProfileAdd);
   postNewCard(imageTitle, link)
     .then((res) => {
-      id = res._id;
-      renderCard({ name: imageTitle, link: link, cardId: id }, userId);
+      renderCard(res, userId);
       closeModal(modalProfileAdd, popupToggleClassOpen, keydownHandle);
       clearValidation(modalProfileAdd, validationConfig);
       modalProfileAddForm.reset();
